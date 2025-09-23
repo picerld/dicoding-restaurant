@@ -28,9 +28,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      headers: [
-        UiAppBar(title: "Restaurant"),
-      ],
+      headers: [UiAppBar(title: "Restaurant")],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -41,18 +39,12 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
               children: const [
                 Text(
                   "Welcome!",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
                 Text(
                   "Cari restoran favorit kamu!!",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.gray,
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.gray),
                 ),
               ],
             ),
@@ -98,10 +90,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         );
       case ResultState.noData:
         return Center(
-          child: Text(
-            provider.message,
-            style: const TextStyle(fontSize: 16),
-          ),
+          child: Text(provider.message, style: const TextStyle(fontSize: 16)),
         );
       case ResultState.error:
         return ErrorState(

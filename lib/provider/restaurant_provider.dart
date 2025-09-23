@@ -25,12 +25,12 @@ class RestaurantProvider extends ChangeNotifier {
   List<Restaurant> _searchResults = [];
   List<Restaurant> get searchResults => _searchResults;
 
-  /// Fetch all restaurants
   Future<void> fetchRestaurants() async {
     try {
       _state = ResultState.loading;
-      notifyListeners();
+
       final result = await apiService.listRestaurants();
+
       if (result.restaurants.isEmpty) {
         _state = ResultState.noData;
         _message = "No restaurants found";
@@ -42,14 +42,16 @@ class RestaurantProvider extends ChangeNotifier {
       _state = ResultState.error;
       _message = "Failed to fetch restaurants: $e";
     }
+
     notifyListeners();
   }
 
   Future<void> fetchRestaurantDetail(String id) async {
     try {
       _state = ResultState.loading;
-      notifyListeners();
+
       final result = await apiService.restaurantDetail(id);
+
       _state = ResultState.hasData;
       _restaurantDetail = result.restaurant;
     } catch (e) {
@@ -62,8 +64,9 @@ class RestaurantProvider extends ChangeNotifier {
   Future<void> searchRestaurants(String query) async {
     try {
       _state = ResultState.loading;
-      notifyListeners();
+
       final result = await apiService.searchRestaurants(query);
+
       if (result.restaurants.isEmpty) {
         _state = ResultState.noData;
         _message = "No results found for \"$query\"";
@@ -81,9 +84,9 @@ class RestaurantProvider extends ChangeNotifier {
   Future<void> addReview(String id, String name, String review) async {
     try {
       final result = await apiService.addReview(id, name, review);
+
       if (result.error == false) {
         _restaurantDetail?.customerReviews = result.customerReviews;
-        notifyListeners();
       } else {
         _message = "Failed to add review";
       }

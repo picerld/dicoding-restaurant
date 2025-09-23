@@ -16,6 +16,8 @@ class RestaurantDetailPage extends StatefulWidget {
 }
 
 class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
+  final ScrollController _reviewScrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -25,6 +27,12 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         listen: false,
       ).fetchRestaurantDetail(widget.id);
     });
+  }
+
+  @override
+  void dispose() {
+    _reviewScrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -44,7 +52,12 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                   );
 
                 case ResultState.hasData:
-                  final restaurant = provider.restaurantDetail!;
+                  final restaurant = provider.restaurantDetail;
+
+                  if (restaurant == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
                   return SingleChildScrollView(
                     key: const ValueKey('hasData'),
                     padding: const EdgeInsets.all(16),
@@ -120,13 +133,14 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                         ),
                         const SizedBox(height: 24),
 
-                        // Reviews
                         Text('Reviews').h3,
                         const SizedBox(height: 8),
                         Container(
                           constraints: const BoxConstraints(maxHeight: 300),
                           child: Scrollbar(
+                            controller: _reviewScrollController,
                             child: ListView.builder(
+                              controller: _reviewScrollController,
                               itemCount: restaurant.customerReviews.length,
                               itemBuilder: (context, index) {
                                 final r = restaurant.customerReviews[index];
