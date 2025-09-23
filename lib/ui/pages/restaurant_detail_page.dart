@@ -119,7 +119,6 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Menu minuman
                         Text('Drinks').h4,
                         const SizedBox(height: 6),
                         Wrap(
