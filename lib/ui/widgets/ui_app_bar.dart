@@ -44,8 +44,9 @@ class UiAppBar extends StatelessWidget {
             ),
 
             OutlineButton(
-              onPressed: onSearch ??
-                      () {
+              onPressed:
+                  onSearch ??
+                  () {
                     Navigator.pushNamed(context, '/search');
                   },
               density: ButtonDensity.icon,

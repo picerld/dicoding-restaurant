@@ -25,9 +25,7 @@ class RestaurantCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    restaurant.name,
-                  ).h2,
+                  Text(restaurant.name).h2,
                   Text(restaurant.city),
                   Row(
                     children: [

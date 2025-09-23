@@ -2,9 +2,8 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api_service.dart';
 import 'package:restaurant_app/provider/restaurant_provider.dart';
 import 'package:restaurant_app/provider/theme_provider.dart';
+import 'package:restaurant_app/theme.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:flutter/material.dart' as material;
-
 import 'ui/pages/restaurant_list_page.dart';
 import 'ui/pages/restaurant_detail_page.dart';
 import 'ui/pages/search_page.dart';
@@ -23,25 +22,17 @@ class RestaurantApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => RestaurantProvider(apiService: ApiService()),
         ),
-        ChangeNotifierProvider(
-          create: (_) => ThemeProvider(),
-        ),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: Builder(
         builder: (context) {
           final themeProvider = Provider.of<ThemeProvider>(context);
 
           return ShadcnApp(
-            title: "Restaurant App",
+            title: "Restaurant",
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              colorScheme: ColorSchemes.lightGreen, // tema terang
-              radius: 0.5,
-            ),
-            darkTheme: ThemeData(
-              colorScheme: ColorSchemes.darkGreen, // tema gelap
-              radius: 0.5,
-            ),
+            theme: lightTheme,
+            darkTheme: darkTheme,
             themeMode: themeProvider.themeMode,
             initialRoute: '/',
             onGenerateRoute: (settings) {
@@ -55,9 +46,7 @@ class RestaurantApp extends StatelessWidget {
                   builder: (_) => RestaurantDetailPage(id: id),
                 );
               } else if (settings.name == '/search') {
-                return MaterialPageRoute(
-                  builder: (_) => const SearchPage(),
-                );
+                return MaterialPageRoute(builder: (_) => const SearchPage());
               }
               return null;
             },

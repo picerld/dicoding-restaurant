@@ -34,7 +34,11 @@ class ApiService {
     }
   }
 
-  Future<ReviewResponse> addReview(String id, String name, String review) async {
+  Future<ReviewResponse> addReview(
+    String id,
+    String name,
+    String review,
+  ) async {
     final response = await http.post(
       Uri.parse("$baseUrl/review"),
       headers: {"Content-Type": "application/json"},

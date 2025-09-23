@@ -1,5 +1,7 @@
 import 'dart:ui' as ui;
 import 'package:provider/provider.dart';
+import 'package:readmore/readmore.dart';
+import 'package:restaurant_app/ui/widgets/error_state.dart';
 import 'package:restaurant_app/ui/widgets/ui_app_bar.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import '../../provider/restaurant_provider.dart';
@@ -17,16 +19,18 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   @override
   void initState() {
     super.initState();
-    Provider.of<RestaurantProvider>(context, listen: false)
-        .fetchRestaurantDetail(widget.id);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<RestaurantProvider>(
+        context,
+        listen: false,
+      ).fetchRestaurantDetail(widget.id);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      headers: [
-        UiAppBar(title: "Restaurant", showBack: true,)
-      ],
+      headers: [UiAppBar(title: "Restaurant", showBack: true)],
       child: Consumer<RestaurantProvider>(
         builder: (context, provider, _) {
           return AnimatedSwitcher(
@@ -38,6 +42,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                     key: ValueKey('loading'),
                     child: CircularProgressIndicator(),
                   );
+
                 case ResultState.hasData:
                   final restaurant = provider.restaurantDetail!;
                   return SingleChildScrollView(
@@ -77,71 +82,102 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           },
                         ),
                         const SizedBox(height: 16),
-                        Text(restaurant.description),
+                        ReadMoreText(
+                          restaurant.description,
+                          trimLines: 3,
+                          colorClickableText: Theme.of(
+                            context,
+                          ).colorScheme.primary,
+                          trimMode: TrimMode.Line,
+                          trimCollapsedText: ' Baca Selengkapnya',
+                          trimExpandedText: ' Sembunyikan',
+                        ),
                         const SizedBox(height: 24),
-
                         Text('Foods').h4,
                         const SizedBox(height: 6),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
                           children: (restaurant.menus['foods'] ?? [])
-                              .map<Widget>((f) => PrimaryBadge(child: Text(f.name)))
+                              .map<Widget>(
+                                (f) => PrimaryBadge(child: Text(f.name)),
+                              )
                               .toList(),
                         ),
                         const SizedBox(height: 16),
 
+                        // Menu minuman
                         Text('Drinks').h4,
                         const SizedBox(height: 6),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
                           children: (restaurant.menus['drinks'] ?? [])
-                              .map<Widget>((d) => PrimaryBadge(child: Text(d.name)))
+                              .map<Widget>(
+                                (d) => PrimaryBadge(child: Text(d.name)),
+                              )
                               .toList(),
                         ),
                         const SizedBox(height: 24),
 
+                        // Reviews
                         Text('Reviews').h3,
                         const SizedBox(height: 8),
-                        ...restaurant.customerReviews.expand((r) => [
-                          PrimaryBadge(
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(r.name).h4,
-                                      Text(r.date),
-                                    ],
+                        Container(
+                          constraints: const BoxConstraints(maxHeight: 300),
+                          child: Scrollbar(
+                            child: ListView.builder(
+                              itemCount: restaurant.customerReviews.length,
+                              itemBuilder: (context, index) {
+                                final r = restaurant.customerReviews[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: PrimaryBadge(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(r.name).h4,
+                                              Text(r.date),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(r.review),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                  const SizedBox(height: 6),
-                                  Text(r.review),
-                                ],
-                              ),
+                                );
+                              },
                             ),
                           ),
-                          const SizedBox(height: 12),
-                        ]),
+                        ),
 
                         const SizedBox(height: 24),
                         ReviewForm(restaurantId: restaurant.id),
                       ],
                     ),
                   );
+
                 case ResultState.noData:
                   return Center(
                     key: const ValueKey('noData'),
                     child: Text(provider.message),
                   );
+
                 case ResultState.error:
                 default:
-                  return Center(
-                    key: const ValueKey('error'),
-                    child: Text('Error: ${provider.message}'),
+                  return ErrorState(
+                    message: provider.message,
+                    onRetry: () {
+                      provider.fetchRestaurantDetail(widget.id);
+                    },
                   );
               }
             }(),

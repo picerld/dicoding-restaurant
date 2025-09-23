@@ -27,13 +27,19 @@ class _ReviewFormState extends State<ReviewForm> {
     final name = _nameController.text.trim();
     final review = _reviewController.text.trim();
     if (name.isNotEmpty && review.isNotEmpty) {
-      Provider.of<RestaurantProvider>(context, listen: false)
-          .addReview(widget.restaurantId, name, review);
+      Provider.of<RestaurantProvider>(
+        context,
+        listen: false,
+      ).addReview(widget.restaurantId, name, review);
 
       _nameController.clear();
       _reviewController.clear();
 
-      showToast(context: context, builder: buildToast, location: ToastLocation.bottomRight);
+      showToast(
+        context: context,
+        builder: buildToast,
+        location: ToastLocation.bottomRight,
+      );
     }
   }
 
@@ -58,10 +64,7 @@ class _ReviewFormState extends State<ReviewForm> {
               maxLines: 3,
             ),
             const SizedBox(height: 16),
-            PrimaryButton(
-              onPressed: _submit,
-              child: const Text("Submit"),
-            ),
+            PrimaryButton(onPressed: _submit, child: const Text("Submit")),
           ],
         ),
       ),

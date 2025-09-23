@@ -18,17 +18,17 @@ class _SearchPageState extends State<SearchPage> {
   void _onSearch() {
     final query = _controller.text;
     if (query.isNotEmpty) {
-      Provider.of<RestaurantProvider>(context, listen: false)
-          .searchRestaurants(query);
+      Provider.of<RestaurantProvider>(
+        context,
+        listen: false,
+      ).searchRestaurants(query);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      headers: [
-        UiAppBar(title: "Restaurant", showBack: true,)
-      ],
+      headers: [UiAppBar(title: "Restaurant", showBack: true)],
       child: Column(
         children: [
           Padding(

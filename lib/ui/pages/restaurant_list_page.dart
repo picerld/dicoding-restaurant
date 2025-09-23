@@ -1,5 +1,5 @@
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/provider/theme_provider.dart';
+import 'package:restaurant_app/ui/widgets/error_state.dart';
 import 'package:restaurant_app/ui/widgets/ui_app_bar.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import '../../provider/restaurant_provider.dart';
@@ -17,22 +17,57 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   @override
   void initState() {
     super.initState();
-    Provider.of<RestaurantProvider>(context, listen: false).fetchRestaurants();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<RestaurantProvider>(
+        context,
+        listen: false,
+      ).fetchRestaurants();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       headers: [
-        UiAppBar(title: "Restaurant")
+        UiAppBar(title: "Restaurant"),
       ],
-      child: Consumer<RestaurantProvider>(
-        builder: (context, provider, _) {
-          return AnimatedSwitcher(
-            duration: const Duration(milliseconds: 400),
-            child: _buildContent(provider),
-          );
-        },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  "Welcome!",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  "Cari restoran favorit kamu!!",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.gray,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Consumer<RestaurantProvider>(
+              builder: (context, provider, _) {
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 400),
+                  child: _buildContent(provider),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -59,12 +94,22 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
               child: RestaurantCard(restaurant: restaurant),
             );
           },
-          separatorBuilder: (context, index) => const SizedBox(height: 30),
+          separatorBuilder: (context, index) => const SizedBox(height: 20),
         );
       case ResultState.noData:
-        return Center(child: Text(provider.message));
+        return Center(
+          child: Text(
+            provider.message,
+            style: const TextStyle(fontSize: 16),
+          ),
+        );
       case ResultState.error:
-        return Center(child: Text("Error: ${provider.message}"));
+        return ErrorState(
+          message: provider.message,
+          onRetry: () {
+            provider.fetchRestaurants();
+          },
+        );
     }
   }
 }
