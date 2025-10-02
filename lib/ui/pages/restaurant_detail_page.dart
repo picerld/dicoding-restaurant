@@ -1,7 +1,9 @@
 import 'dart:ui' as ui;
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
+import 'package:restaurant_app/data/model/favorite_restaurant.dart';
 import 'package:restaurant_app/ui/widgets/error_state.dart';
+import 'package:restaurant_app/ui/widgets/favorite_button.dart';
 import 'package:restaurant_app/ui/widgets/ui_app_bar.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import '../../provider/restaurant_provider.dart';
@@ -73,6 +75,15 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                               "https://restaurant-api.dicoding.dev/images/large/${restaurant.pictureId}",
                               fit: BoxFit.cover,
                             ),
+                          ),
+                        ),
+                        FavoriteButton(
+                          fav: FavoriteRestaurant(
+                            id: restaurant.id,
+                            name: restaurant.name,
+                            pictureId: restaurant.pictureId,
+                            city: restaurant.city,
+                            rating: restaurant.rating,
                           ),
                         ),
                         const SizedBox(height: 16),

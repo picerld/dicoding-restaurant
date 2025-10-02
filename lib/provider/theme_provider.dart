@@ -1,3 +1,4 @@
+import 'package:restaurant_app/data/local/shared_prefs_service.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class ThemeProvider extends ChangeNotifier {
@@ -5,17 +6,34 @@ class ThemeProvider extends ChangeNotifier {
 
   ThemeMode get themeMode => _themeMode;
 
-  void toggleTheme() {
-    if (_themeMode == ThemeMode.light) {
-      _themeMode = ThemeMode.dark;
-    } else {
-      _themeMode = ThemeMode.light;
+  Future<void> loadTheme() async {
+    final saved = await SharedPrefsService.getThemeMode();
+    switch (saved) {
+      case 'light':
+        _themeMode = ThemeMode.light;
+        break;
+      case 'dark':
+        _themeMode = ThemeMode.dark;
+        break;
+      default:
+        _themeMode = ThemeMode.system;
     }
     notifyListeners();
   }
 
-  void setTheme(ThemeMode mode) {
+  Future<void> setTheme(ThemeMode mode) async {
     _themeMode = mode;
+    await SharedPrefsService.setThemeMode(
+      mode == ThemeMode.light ? 'light' : mode == ThemeMode.dark ? 'dark' : 'system',
+    );
     notifyListeners();
+  }
+
+  Future<void> toggleTheme() async {
+    if (_themeMode == ThemeMode.light) {
+      await setTheme(ThemeMode.dark);
+    } else {
+      await setTheme(ThemeMode.light);
+    }
   }
 }

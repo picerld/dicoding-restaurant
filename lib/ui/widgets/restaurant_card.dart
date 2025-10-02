@@ -9,7 +9,8 @@ class RestaurantCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Hero(
       tag: restaurant.id,
-      child: Card(
+      child: SurfaceCard(
+        padding: EdgeInsets.zero,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -29,7 +30,7 @@ class RestaurantCard extends StatelessWidget {
                   Text(restaurant.city),
                   Row(
                     children: [
-                      const Icon(Icons.star, color: Colors.amber),
+                      const Icon(Icons.star),
                       Text("${restaurant.rating}"),
                     ],
                   ),
@@ -40,5 +41,6 @@ class RestaurantCard extends StatelessWidget {
         ),
       ),
     );
+
   }
 }

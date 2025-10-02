@@ -1,4 +1,5 @@
 import 'package:provider/provider.dart';
+import 'package:restaurant_app/ui/widgets/bottom_nav.dart';
 import 'package:restaurant_app/ui/widgets/error_state.dart';
 import 'package:restaurant_app/ui/widgets/ui_app_bar.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
@@ -14,6 +15,19 @@ class RestaurantListPage extends StatefulWidget {
 }
 
 class _RestaurantListPageState extends State<RestaurantListPage> {
+  int _index = 0;
+
+  void _onNavTap(int i) {
+    setState(() => _index = i);
+    if (i == 0) {
+      Navigator.pushReplacementNamed(context, '/');
+    } else if (i == 1) {
+      Navigator.pushReplacementNamed(context, '/favorites');
+    } else if (i == 2) {
+      Navigator.pushReplacementNamed(context, '/settings');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +75,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
           ),
         ],
       ),
+      footers: [ShadcnBottomNav(currentIndex: _index, onTap: _onNavTap)],
     );
   }
 

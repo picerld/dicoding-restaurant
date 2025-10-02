@@ -32,6 +32,16 @@ class UiAppBar extends StatelessWidget {
               ),
           ],
           trailing: [
+            OutlineButton(
+              onPressed:
+                  onSearch ??
+                  () {
+                    Navigator.pushNamed(context, '/search');
+                  },
+              density: ButtonDensity.icon,
+              child: const Icon(Icons.search),
+            ),
+
             IconButton.outline(
               icon: Icon(
                 context.watch<ThemeProvider>().themeMode == ThemeMode.dark
@@ -41,16 +51,6 @@ class UiAppBar extends StatelessWidget {
               onPressed: () {
                 context.read<ThemeProvider>().toggleTheme();
               },
-            ),
-
-            OutlineButton(
-              onPressed:
-                  onSearch ??
-                  () {
-                    Navigator.pushNamed(context, '/search');
-                  },
-              density: ButtonDensity.icon,
-              child: const Icon(Icons.search),
             ),
           ],
         ),
