@@ -2,6 +2,7 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/local/notification_service.dart';
 import 'package:restaurant_app/provider/theme_provider.dart';
 import 'package:restaurant_app/provider/reminder_provider.dart';
+import 'package:restaurant_app/provider/nav_provider.dart'; // ✅ import NavProvider
 import 'package:restaurant_app/ui/widgets/bottom_nav.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import '../widgets/ui_app_bar.dart';
@@ -14,17 +15,12 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  int _index = 2; // Karena halaman ini Settings
-
-  void _onNavTap(int i) {
-    setState(() => _index = i);
-    if (i == 0) {
-      Navigator.pushReplacementNamed(context, '/');
-    } else if (i == 1) {
-      Navigator.pushReplacementNamed(context, '/favorites');
-    } else if (i == 2) {
-      Navigator.pushReplacementNamed(context, '/settings');
-    }
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<NavProvider>().setIndex(context, 2);
+    });
   }
 
   @override
@@ -50,19 +46,22 @@ class _SettingsPageState extends State<SettingsPage> {
                 label: "Light",
                 icon: Icons.light_mode,
                 active: themeProv.themeMode == ThemeMode.light,
-                onTap: () => context.read<ThemeProvider>().setTheme(ThemeMode.light),
+                onTap: () =>
+                    context.read<ThemeProvider>().setTheme(ThemeMode.light),
               ),
               _ThemeButton(
                 label: "Dark",
                 icon: Icons.dark_mode,
                 active: themeProv.themeMode == ThemeMode.dark,
-                onTap: () => context.read<ThemeProvider>().setTheme(ThemeMode.dark),
+                onTap: () =>
+                    context.read<ThemeProvider>().setTheme(ThemeMode.dark),
               ),
               _ThemeButton(
                 label: "System",
                 icon: Icons.phone_iphone,
                 active: themeProv.themeMode == ThemeMode.system,
-                onTap: () => context.read<ThemeProvider>().setTheme(ThemeMode.system),
+                onTap: () =>
+                    context.read<ThemeProvider>().setTheme(ThemeMode.system),
               ),
             ],
           ),
@@ -77,13 +76,13 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 12),
 
-          const SizedBox(height: 20),
           PrimaryButton(
             onPressed: () {
               NotificationService.showInstantNotification();
             },
             child: const Text("Test Notification"),
           ),
+          const SizedBox(height: 20),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -106,21 +105,23 @@ class _SettingsPageState extends State<SettingsPage> {
                   }
                 },
               ),
-
             ],
           ),
           const SizedBox(height: 6),
-          Text(
+          const Text(
             "Notifikasi terjadwal setiap hari pukul 11:00",
-            style: const TextStyle(fontSize: 12, color: Colors.gray),
+            style: TextStyle(fontSize: 12, color: Colors.gray),
           ),
         ],
       ),
+
       footers: [
         const Divider(),
-        ShadcnBottomNav(
-          currentIndex: _index,
-          onTap: _onNavTap,
+        Consumer<NavProvider>(
+          builder: (context, nav, _) => ShadcnBottomNav(
+            currentIndex: nav.index,
+            onTap: (i) => nav.setIndex(context, i),
+          ),
         ),
       ],
     );
@@ -145,11 +146,7 @@ class _ThemeButton extends StatelessWidget {
     return PrimaryButton(
       onPressed: onTap,
       child: Row(
-        children: [
-          Icon(icon, size: 16),
-          const SizedBox(width: 6),
-          Text(label),
-        ],
+        children: [Icon(icon, size: 16), const SizedBox(width: 6), Text(label)],
       ),
     );
   }

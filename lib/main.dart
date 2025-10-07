@@ -2,6 +2,7 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api_service.dart';
 import 'package:restaurant_app/data/local/notification_service.dart';
 import 'package:restaurant_app/provider/favorite_provider.dart';
+import 'package:restaurant_app/provider/nav_provider.dart';
 import 'package:restaurant_app/provider/reminder_provider.dart';
 import 'package:restaurant_app/provider/restaurant_provider.dart';
 import 'package:restaurant_app/provider/theme_provider.dart';
@@ -27,10 +28,15 @@ class RestaurantApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => RestaurantProvider(apiService: ApiService())),
+        ChangeNotifierProvider(
+          create: (_) => RestaurantProvider(apiService: ApiService()),
+        ),
         ChangeNotifierProvider(create: (_) => ThemeProvider()..loadTheme()),
-        ChangeNotifierProvider(create: (_) => FavoriteProvider()..loadFavorites()),
+        ChangeNotifierProvider(
+          create: (_) => FavoriteProvider()..loadFavorites(),
+        ),
         ChangeNotifierProvider(create: (_) => ReminderProvider()..load()),
+        ChangeNotifierProvider(create: (_) => NavProvider()),
       ],
       child: Builder(
         builder: (context) {
@@ -55,11 +61,9 @@ class RestaurantApp extends StatelessWidget {
                 );
               } else if (settings.name == '/search') {
                 return MaterialPageRoute(builder: (_) => const SearchPage());
-              }
-              else if (settings.name == '/favorites') {
+              } else if (settings.name == '/favorites') {
                 return MaterialPageRoute(builder: (_) => const FavoritePage());
-              }
-              else if (settings.name == '/settings') {
+              } else if (settings.name == '/settings') {
                 return MaterialPageRoute(builder: (_) => const SettingsPage());
               }
               return null;

@@ -74,6 +74,8 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                             child: Image.network(
                               "https://restaurant-api.dicoding.dev/images/large/${restaurant.pictureId}",
                               fit: BoxFit.cover,
+                              height: MediaQuery.of(context).size.height * 0.3,
+                              width: double.infinity,
                             ),
                           ),
                         ),

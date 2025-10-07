@@ -24,7 +24,11 @@ class ThemeProvider extends ChangeNotifier {
   Future<void> setTheme(ThemeMode mode) async {
     _themeMode = mode;
     await SharedPrefsService.setThemeMode(
-      mode == ThemeMode.light ? 'light' : mode == ThemeMode.dark ? 'dark' : 'system',
+      mode == ThemeMode.light
+          ? 'light'
+          : mode == ThemeMode.dark
+          ? 'dark'
+          : 'system',
     );
     notifyListeners();
   }

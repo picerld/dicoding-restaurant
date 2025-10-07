@@ -29,54 +29,70 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       headers: [UiAppBar(title: "Restaurant", showBack: true)],
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _controller,
-              placeholder: const Text("Search..."),
-              leading: PrimaryButton(
-                onPressed: _onSearch,
-                child: const Text("Go"),
-              ),
+      child: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height,
+          ),
+          child: IntrinsicHeight(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: TextField(
+                    controller: _controller,
+                    placeholder: const Text("Search..."),
+                    leading: PrimaryButton(
+                      onPressed: _onSearch,
+                      child: const Text("Go"),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Consumer<RestaurantProvider>(
+                    builder: (context, provider, _) {
+                      switch (provider.state) {
+                        case ResultState.loading:
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        case ResultState.hasData:
+                          return ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: provider.searchResults.length,
+                            itemBuilder: (context, index) {
+                              final restaurant = provider.searchResults[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => RestaurantDetailPage(
+                                        id: restaurant.id,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: RestaurantCard(restaurant: restaurant),
+                              );
+                            },
+                          );
+                        case ResultState.noData:
+                          return Center(child: Text(provider.message));
+                        case ResultState.error:
+                          return Center(
+                            child: Text("Error: ${provider.message}"),
+                          );
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-          Expanded(
-            child: Consumer<RestaurantProvider>(
-              builder: (context, provider, _) {
-                switch (provider.state) {
-                  case ResultState.loading:
-                    return const Center(child: CircularProgressIndicator());
-                  case ResultState.hasData:
-                    return ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: provider.searchResults.length,
-                      itemBuilder: (context, index) {
-                        final restaurant = provider.searchResults[index];
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    RestaurantDetailPage(id: restaurant.id),
-                              ),
-                            );
-                          },
-                          child: RestaurantCard(restaurant: restaurant),
-                        );
-                      },
-                    );
-                  case ResultState.noData:
-                    return Center(child: Text(provider.message));
-                  case ResultState.error:
-                    return Center(child: Text("Error: ${provider.message}"));
-                }
-              },
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

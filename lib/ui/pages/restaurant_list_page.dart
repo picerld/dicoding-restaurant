@@ -1,4 +1,5 @@
 import 'package:provider/provider.dart';
+import 'package:restaurant_app/provider/nav_provider.dart';
 import 'package:restaurant_app/ui/widgets/bottom_nav.dart';
 import 'package:restaurant_app/ui/widgets/error_state.dart';
 import 'package:restaurant_app/ui/widgets/ui_app_bar.dart';
@@ -15,42 +16,29 @@ class RestaurantListPage extends StatefulWidget {
 }
 
 class _RestaurantListPageState extends State<RestaurantListPage> {
-  int _index = 0;
-
-  void _onNavTap(int i) {
-    setState(() => _index = i);
-    if (i == 0) {
-      Navigator.pushReplacementNamed(context, '/');
-    } else if (i == 1) {
-      Navigator.pushReplacementNamed(context, '/favorites');
-    } else if (i == 2) {
-      Navigator.pushReplacementNamed(context, '/settings');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<RestaurantProvider>(
-        context,
-        listen: false,
-      ).fetchRestaurants();
+      context.read<RestaurantProvider>().fetchRestaurants();
+      context.read<NavProvider>().setIndex(context, 0);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final navProvider = context.watch<NavProvider>();
+
     return Scaffold(
-      headers: [UiAppBar(title: "Restaurant")],
+      headers: const [UiAppBar(title: "Restaurant")],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
                   "Welcome!",
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
@@ -63,6 +51,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
               ],
             ),
           ),
+
           Expanded(
             child: Consumer<RestaurantProvider>(
               builder: (context, provider, _) {
@@ -75,7 +64,14 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
           ),
         ],
       ),
-      footers: [ShadcnBottomNav(currentIndex: _index, onTap: _onNavTap)],
+      footers: [
+        Consumer<NavProvider>(
+          builder: (context, nav, _) => ShadcnBottomNav(
+            currentIndex: nav.index,
+            onTap: (i) => nav.setIndex(context, i),
+          ),
+        ),
+      ],
     );
   }
 
@@ -83,10 +79,12 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     switch (provider.state) {
       case ResultState.loading:
         return const Center(child: CircularProgressIndicator());
+
       case ResultState.hasData:
         return ListView.separated(
           padding: const EdgeInsets.all(16),
           itemCount: provider.restaurants.length,
+          separatorBuilder: (context, _) => const SizedBox(height: 20),
           itemBuilder: (context, index) {
             final restaurant = provider.restaurants[index];
             return GestureDetector(
@@ -95,24 +93,24 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                   context,
                   MaterialPageRoute(
                     builder: (_) => RestaurantDetailPage(id: restaurant.id),
+                    maintainState: true,
                   ),
                 );
               },
               child: RestaurantCard(restaurant: restaurant),
             );
           },
-          separatorBuilder: (context, index) => const SizedBox(height: 20),
         );
+
       case ResultState.noData:
         return Center(
           child: Text(provider.message, style: const TextStyle(fontSize: 16)),
         );
+
       case ResultState.error:
         return ErrorState(
           message: provider.message,
-          onRetry: () {
-            provider.fetchRestaurants();
-          },
+          onRetry: provider.fetchRestaurants,
         );
     }
   }
