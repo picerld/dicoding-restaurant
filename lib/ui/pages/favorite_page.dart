@@ -4,6 +4,7 @@ import 'package:restaurant_app/ui/widgets/bottom_nav.dart';
 import 'package:restaurant_app/ui/widgets/ui_app_bar.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:restaurant_app/provider/favorite_provider.dart';
+import 'package:restaurant_app/provider/nav_provider.dart';
 import 'package:restaurant_app/ui/pages/restaurant_detail_page.dart';
 
 class FavoritePage extends StatefulWidget {
@@ -14,19 +15,6 @@ class FavoritePage extends StatefulWidget {
 }
 
 class _FavoritePageState extends State<FavoritePage> {
-  int _index = 1;
-
-  void _onNavTap(int i) {
-    setState(() => _index = i);
-    if (i == 0) {
-      Navigator.pushReplacementNamed(context, '/');
-    } else if (i == 1) {
-      Navigator.pushReplacementNamed(context, '/favorites');
-    } else if (i == 2) {
-      Navigator.pushReplacementNamed(context, '/settings');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -36,10 +24,11 @@ class _FavoritePageState extends State<FavoritePage> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<FavoriteProvider>();
+    final navProvider = context.watch<NavProvider>();
     final items = provider.favorites;
 
     return Scaffold(
-      headers: const [UiAppBar(title: "Favorit", showBack: true,)],
+      headers: const [UiAppBar(title: "Favorit", showBack: true)],
       child: items.isEmpty
           ? const Center(child: Text("Belum ada restoran favorit"))
           : ListView.separated(
@@ -49,6 +38,7 @@ class _FavoritePageState extends State<FavoritePage> {
         itemBuilder: (context, i) {
           final r = items[i];
           return Card(
+            key: ValueKey('favoriteCard_${r.id}'),
             child: m.InkWell(
               borderRadius: BorderRadius.circular(12),
               onTap: () {
@@ -63,65 +53,68 @@ class _FavoritePageState extends State<FavoritePage> {
                 padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
-                    // Image
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Image.network(
                         "https://restaurant-api.dicoding.dev/images/small/${r.pictureId}",
                         width: 80,
                         height: 80,
-                        fit: BoxFit.cover,
+                        fit: m.BoxFit.cover,
                         errorBuilder: (_, __, ___) => Container(
                           width: 80,
                           height: 80,
-                          color: Colors.gray[300],
-                          child: const Icon(Icons.restaurant, size: 32),
+                          color: m.Colors.grey[300],
+                          child: const m.Icon(m.Icons.restaurant, size: 32),
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 12),
-
-                    // Info (name, city, rating)
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: m.CrossAxisAlignment.start,
                         children: [
                           Text(
                             r.name,
-                            style: const TextStyle(
+                            key: ValueKey('favoriteName_${r.id}'),
+                            style: const m.TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: m.FontWeight.bold,
                             ),
                             maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            overflow: m.TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 6),
                           Text(
                             r.city,
-                            style: TextStyle(fontSize: 13, color: Colors.gray[600]),
+                            style: m.TextStyle(
+                              fontSize: 13,
+                              color: m.Colors.grey[600],
+                            ),
                           ),
                           const SizedBox(height: 6),
                           Row(
                             children: [
-                              const Icon(Icons.star, size: 14),
+                              const m.Icon(m.Icons.star, size: 14),
                               const SizedBox(width: 6),
-                              Text(r.rating.toString(), style: const TextStyle(fontSize: 13)),
+                              Text(
+                                r.rating.toString(),
+                                style: const m.TextStyle(fontSize: 13),
+                              ),
                             ],
                           ),
                         ],
                       ),
                     ),
-
-                    // Action buttons (hapus favorit)
                     const SizedBox(width: 8),
                     Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisSize: m.MainAxisSize.min,
                       children: [
-                        // pakai ikon kecil — sesuaikan dengan shadcn jika mau style beda
                         IconButton.ghost(
-                          onPressed: () => context.read<FavoriteProvider>().removeFavorite(r.id),
-                          icon: const Icon(Icons.delete_outline),
+                          key: ValueKey('favoriteDelete_${r.id}'),
+                          onPressed: () => context
+                              .read<FavoriteProvider>()
+                              .removeFavorite(r.id),
+                          icon: const m.Icon(m.Icons.delete_outline),
                         ),
                       ],
                     )
@@ -132,7 +125,12 @@ class _FavoritePageState extends State<FavoritePage> {
           );
         },
       ),
-      footers: [ShadcnBottomNav(currentIndex: _index, onTap: _onNavTap)],
+      footers: [
+        ShadcnBottomNav(
+          currentIndex: navProvider.index,
+          onTap: (i) => navProvider.setIndex(context, i),
+        ),
+      ],
     );
   }
 }

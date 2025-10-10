@@ -7,6 +7,12 @@ class FavoriteProvider extends ChangeNotifier {
 
   List<FavoriteRestaurant> get favorites => List.unmodifiable(_favorites);
 
+  FavoriteProvider({List<FavoriteRestaurant>? testFavorites}) {
+    if (testFavorites != null) {
+      _favorites.addAll(testFavorites);
+    }
+  }
+
   Future<void> loadFavorites() async {
     final listMap = await SharedPrefsService.getFavorites();
     _favorites

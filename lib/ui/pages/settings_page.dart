@@ -1,5 +1,6 @@
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/local/notification_service.dart';
+import 'package:restaurant_app/provider/nav_provider.dart';
 import 'package:restaurant_app/provider/theme_provider.dart';
 import 'package:restaurant_app/provider/reminder_provider.dart';
 import 'package:restaurant_app/ui/widgets/bottom_nav.dart';
@@ -14,17 +15,13 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  int _index = 2; // Karena halaman ini Settings
+  @override
+  void initState() {
+    super.initState();
 
-  void _onNavTap(int i) {
-    setState(() => _index = i);
-    if (i == 0) {
-      Navigator.pushReplacementNamed(context, '/');
-    } else if (i == 1) {
-      Navigator.pushReplacementNamed(context, '/favorites');
-    } else if (i == 2) {
-      Navigator.pushReplacementNamed(context, '/settings');
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<NavProvider>().setIndex(context, 3);
+    });
   }
 
   @override
@@ -85,6 +82,8 @@ class _SettingsPageState extends State<SettingsPage> {
             child: const Text("Test Notification"),
           ),
 
+          const SizedBox(height: 20),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -117,10 +116,11 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
       ),
       footers: [
-        const Divider(),
-        ShadcnBottomNav(
-          currentIndex: _index,
-          onTap: _onNavTap,
+        Consumer<NavProvider>(
+          builder: (context, nav, _) => ShadcnBottomNav(
+            currentIndex: nav.index,
+            onTap: (i) => nav.setIndex(context, i),
+          ),
         ),
       ],
     );

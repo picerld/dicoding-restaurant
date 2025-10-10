@@ -1,4 +1,5 @@
 import 'package:provider/provider.dart';
+import 'package:restaurant_app/provider/nav_provider.dart';
 import 'package:restaurant_app/ui/widgets/bottom_nav.dart';
 import 'package:restaurant_app/ui/widgets/error_state.dart';
 import 'package:restaurant_app/ui/widgets/ui_app_bar.dart';
@@ -15,56 +16,48 @@ class RestaurantListPage extends StatefulWidget {
 }
 
 class _RestaurantListPageState extends State<RestaurantListPage> {
-  int _index = 0;
-
-  void _onNavTap(int i) {
-    setState(() => _index = i);
-    if (i == 0) {
-      Navigator.pushReplacementNamed(context, '/');
-    } else if (i == 1) {
-      Navigator.pushReplacementNamed(context, '/favorites');
-    } else if (i == 2) {
-      Navigator.pushReplacementNamed(context, '/settings');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<RestaurantProvider>(
-        context,
-        listen: false,
-      ).fetchRestaurants();
+      Provider.of<RestaurantProvider>(context, listen: false)
+          .fetchRestaurants();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final navProvider = Provider.of<NavProvider>(context);
+
     return Scaffold(
-      headers: [UiAppBar(title: "Restaurant")],
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  "Welcome!",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  "Cari restoran favorit kamu!!",
-                  style: TextStyle(fontSize: 16, color: Colors.gray),
-                ),
-              ],
+      headers: const [UiAppBar(title: "Restaurant")],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 80),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    "Welcome!",
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "Cari restoran favorit kamu!!",
+                    style: TextStyle(fontSize: 16, color: Colors.gray),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: Consumer<RestaurantProvider>(
+            Consumer<RestaurantProvider>(
               builder: (context, provider, _) {
                 return AnimatedSwitcher(
                   duration: const Duration(milliseconds: 400),
@@ -72,10 +65,15 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                 );
               },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-      footers: [ShadcnBottomNav(currentIndex: _index, onTap: _onNavTap)],
+      footers: [
+        ShadcnBottomNav(
+          currentIndex: navProvider.index,
+          onTap: (i) => navProvider.setIndex(context, i),
+        ),
+      ],
     );
   }
 
@@ -85,6 +83,8 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         return const Center(child: CircularProgressIndicator());
       case ResultState.hasData:
         return ListView.separated(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
           padding: const EdgeInsets.all(16),
           itemCount: provider.restaurants.length,
           itemBuilder: (context, index) {
@@ -105,7 +105,8 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         );
       case ResultState.noData:
         return Center(
-          child: Text(provider.message, style: const TextStyle(fontSize: 16)),
+          child: Text(provider.message,
+              style: const TextStyle(fontSize: 16)),
         );
       case ResultState.error:
         return ErrorState(

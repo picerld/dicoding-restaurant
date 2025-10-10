@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 import 'package:restaurant_app/data/model/favorite_restaurant.dart';
+import 'package:restaurant_app/provider/nav_provider.dart';
 import 'package:restaurant_app/ui/widgets/error_state.dart';
 import 'package:restaurant_app/ui/widgets/favorite_button.dart';
 import 'package:restaurant_app/ui/widgets/ui_app_bar.dart';
@@ -24,10 +25,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<RestaurantProvider>(
-        context,
-        listen: false,
-      ).fetchRestaurantDetail(widget.id);
+      context.read<RestaurantProvider>().fetchRestaurantDetail(widget.id);
     });
   }
 
@@ -40,7 +38,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      headers: [UiAppBar(title: "Restaurant", showBack: true)],
+      headers: const [UiAppBar(title: "Restaurant", showBack: true)],
       child: Consumer<RestaurantProvider>(
         builder: (context, provider, _) {
           return AnimatedSwitcher(
@@ -55,7 +53,6 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
 
                 case ResultState.hasData:
                   final restaurant = provider.restaurantDetail;
-
                   if (restaurant == null) {
                     return const Center(child: CircularProgressIndicator());
                   }
@@ -109,14 +106,15 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                         ReadMoreText(
                           restaurant.description,
                           trimLines: 3,
-                          colorClickableText: Theme.of(
-                            context,
-                          ).colorScheme.primary,
+                          colorClickableText:
+                          Theme.of(context).colorScheme.primary,
                           trimMode: TrimMode.Line,
                           trimCollapsedText: ' Baca Selengkapnya',
                           trimExpandedText: ' Sembunyikan',
                         ),
                         const SizedBox(height: 24),
+
+                        // Foods
                         Text('Foods').h4,
                         const SizedBox(height: 6),
                         Wrap(
@@ -125,11 +123,12 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           children: (restaurant.menus['foods'] ?? [])
                               .map<Widget>(
                                 (f) => PrimaryBadge(child: Text(f.name)),
-                              )
+                          )
                               .toList(),
                         ),
                         const SizedBox(height: 16),
 
+                        // Drinks
                         Text('Drinks').h4,
                         const SizedBox(height: 6),
                         Wrap(
@@ -138,20 +137,23 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           children: (restaurant.menus['drinks'] ?? [])
                               .map<Widget>(
                                 (d) => PrimaryBadge(child: Text(d.name)),
-                              )
+                          )
                               .toList(),
                         ),
                         const SizedBox(height: 24),
 
+                        // Reviews section
                         Text('Reviews').h3,
                         const SizedBox(height: 8),
                         Container(
                           constraints: const BoxConstraints(maxHeight: 300),
                           child: Scrollbar(
                             controller: _reviewScrollController,
+                            thumbVisibility: true,
                             child: ListView.builder(
                               controller: _reviewScrollController,
                               itemCount: restaurant.customerReviews.length,
+                              shrinkWrap: true,
                               itemBuilder: (context, index) {
                                 final r = restaurant.customerReviews[index];
                                 return Padding(
@@ -161,14 +163,29 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                       padding: const EdgeInsets.all(12),
                                       child: Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
+                                          // ✅ FIX OVERFLOW
                                           Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                             children: [
-                                              Text(r.name).h4,
-                                              Text(r.date),
+                                              Expanded(
+                                                child: Text(
+                                                  r.name,
+                                                  overflow:
+                                                  TextOverflow.ellipsis,
+                                                ).h4,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Flexible(
+                                                child: Text(
+                                                  r.date,
+                                                  overflow:
+                                                  TextOverflow.ellipsis,
+                                                  textAlign: TextAlign.end,
+                                                ).h4,
+                                              ),
                                             ],
                                           ),
                                           const SizedBox(height: 6),
@@ -182,7 +199,6 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 24),
                         ReviewForm(restaurantId: restaurant.id),
                       ],
