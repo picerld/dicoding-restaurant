@@ -20,8 +20,10 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<RestaurantProvider>(context, listen: false)
-          .fetchRestaurants();
+      Provider.of<RestaurantProvider>(
+        context,
+        listen: false,
+      ).fetchRestaurants();
     });
   }
 
@@ -37,17 +39,13 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
                   Text(
                     "Welcome!",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
                   Text(
@@ -105,8 +103,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         );
       case ResultState.noData:
         return Center(
-          child: Text(provider.message,
-              style: const TextStyle(fontSize: 16)),
+          child: Text(provider.message, style: const TextStyle(fontSize: 16)),
         );
       case ResultState.error:
         return ErrorState(

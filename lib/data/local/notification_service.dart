@@ -9,7 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 class NotificationService {
   static FlutterLocalNotificationsPlugin _plugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   static const String _channelId = 'daily_reminder_channel';
 
@@ -22,8 +22,8 @@ class NotificationService {
 
   @visibleForTesting
   static set getRandomRestaurantOverride(
-      Future<Map<String, dynamic>?> Function()? callback,
-      ) {
+    Future<Map<String, dynamic>?> Function()? callback,
+  ) {
     _getRandomRestaurantOverride = callback;
   }
 
@@ -81,9 +81,11 @@ class NotificationService {
     debugPrint("✅ Notifikasi diinisialisasi dengan timezone: Asia/Jakarta");
 
     final hasPermission = await requestNotificationPermission();
-    debugPrint(hasPermission
-        ? "✅ Izin notifikasi berhasil diminta saat init"
-        : "⚠️ Izin notifikasi tidak diberikan saat init");
+    debugPrint(
+      hasPermission
+          ? "✅ Izin notifikasi berhasil diminta saat init"
+          : "⚠️ Izin notifikasi tidak diberikan saat init",
+    );
 
     return hasPermission;
   }

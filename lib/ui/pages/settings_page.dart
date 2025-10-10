@@ -47,19 +47,22 @@ class _SettingsPageState extends State<SettingsPage> {
                 label: "Light",
                 icon: Icons.light_mode,
                 active: themeProv.themeMode == ThemeMode.light,
-                onTap: () => context.read<ThemeProvider>().setTheme(ThemeMode.light),
+                onTap: () =>
+                    context.read<ThemeProvider>().setTheme(ThemeMode.light),
               ),
               _ThemeButton(
                 label: "Dark",
                 icon: Icons.dark_mode,
                 active: themeProv.themeMode == ThemeMode.dark,
-                onTap: () => context.read<ThemeProvider>().setTheme(ThemeMode.dark),
+                onTap: () =>
+                    context.read<ThemeProvider>().setTheme(ThemeMode.dark),
               ),
               _ThemeButton(
                 label: "System",
                 icon: Icons.phone_iphone,
                 active: themeProv.themeMode == ThemeMode.system,
-                onTap: () => context.read<ThemeProvider>().setTheme(ThemeMode.system),
+                onTap: () =>
+                    context.read<ThemeProvider>().setTheme(ThemeMode.system),
               ),
             ],
           ),
@@ -105,7 +108,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   }
                 },
               ),
-
             ],
           ),
           const SizedBox(height: 6),
@@ -145,11 +147,7 @@ class _ThemeButton extends StatelessWidget {
     return PrimaryButton(
       onPressed: onTap,
       child: Row(
-        children: [
-          Icon(icon, size: 16),
-          const SizedBox(width: 6),
-          Text(label),
-        ],
+        children: [Icon(icon, size: 16), const SizedBox(width: 6), Text(label)],
       ),
     );
   }

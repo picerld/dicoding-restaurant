@@ -32,99 +32,102 @@ class _FavoritePageState extends State<FavoritePage> {
       child: items.isEmpty
           ? const Center(child: Text("Belum ada restoran favorit"))
           : ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: items.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 16),
-        itemBuilder: (context, i) {
-          final r = items[i];
-          return Card(
-            key: ValueKey('favoriteCard_${r.id}'),
-            child: m.InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => RestaurantDetailPage(id: r.id),
-                  ),
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        "https://restaurant-api.dicoding.dev/images/small/${r.pictureId}",
-                        width: 80,
-                        height: 80,
-                        fit: m.BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          width: 80,
-                          height: 80,
-                          color: m.Colors.grey[300],
-                          child: const m.Icon(m.Icons.restaurant, size: 32),
+              padding: const EdgeInsets.all(16),
+              itemCount: items.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 16),
+              itemBuilder: (context, i) {
+                final r = items[i];
+                return Card(
+                  key: ValueKey('favoriteCard_${r.id}'),
+                  child: m.InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => RestaurantDetailPage(id: r.id),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: m.CrossAxisAlignment.start,
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
                         children: [
-                          Text(
-                            r.name,
-                            key: ValueKey('favoriteName_${r.id}'),
-                            style: const m.TextStyle(
-                              fontSize: 16,
-                              fontWeight: m.FontWeight.bold,
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(
+                              "https://restaurant-api.dicoding.dev/images/small/${r.pictureId}",
+                              width: 80,
+                              height: 80,
+                              fit: m.BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                width: 80,
+                                height: 80,
+                                color: m.Colors.grey[300],
+                                child: const m.Icon(
+                                  m.Icons.restaurant,
+                                  size: 32,
+                                ),
+                              ),
                             ),
-                            maxLines: 1,
-                            overflow: m.TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            r.city,
-                            style: m.TextStyle(
-                              fontSize: 13,
-                              color: m.Colors.grey[600],
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: m.CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  r.name,
+                                  key: ValueKey('favoriteName_${r.id}'),
+                                  style: const m.TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: m.FontWeight.bold,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: m.TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  r.city,
+                                  style: m.TextStyle(
+                                    fontSize: 13,
+                                    color: m.Colors.grey[600],
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const m.Icon(m.Icons.star, size: 14),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      r.rating.toString(),
+                                      style: const m.TextStyle(fontSize: 13),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 6),
-                          Row(
+                          const SizedBox(width: 8),
+                          Column(
+                            mainAxisSize: m.MainAxisSize.min,
                             children: [
-                              const m.Icon(m.Icons.star, size: 14),
-                              const SizedBox(width: 6),
-                              Text(
-                                r.rating.toString(),
-                                style: const m.TextStyle(fontSize: 13),
+                              IconButton.ghost(
+                                key: ValueKey('favoriteDelete_${r.id}'),
+                                onPressed: () => context
+                                    .read<FavoriteProvider>()
+                                    .removeFavorite(r.id),
+                                icon: const m.Icon(m.Icons.delete_outline),
                               ),
                             ],
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Column(
-                      mainAxisSize: m.MainAxisSize.min,
-                      children: [
-                        IconButton.ghost(
-                          key: ValueKey('favoriteDelete_${r.id}'),
-                          onPressed: () => context
-                              .read<FavoriteProvider>()
-                              .removeFavorite(r.id),
-                          icon: const m.Icon(m.Icons.delete_outline),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
       footers: [
         ShadcnBottomNav(
           currentIndex: navProvider.index,

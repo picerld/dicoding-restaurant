@@ -26,17 +26,18 @@ class RestaurantProvider extends ChangeNotifier {
   List<Restaurant> get searchResults => _searchResults;
 
   Future<void> fetchRestaurants() async {
+    _state = ResultState.loading;
+    _restaurants = [];
+    notifyListeners();
+
     try {
-      _state = ResultState.loading;
-
       final result = await apiService.listRestaurants();
-
       if (result.restaurants.isEmpty) {
         _state = ResultState.noData;
         _message = "No restaurants found";
       } else {
-        _state = ResultState.hasData;
         _restaurants = result.restaurants;
+        _state = ResultState.hasData;
       }
     } catch (e) {
       _state = ResultState.error;
@@ -47,37 +48,48 @@ class RestaurantProvider extends ChangeNotifier {
   }
 
   Future<void> fetchRestaurantDetail(String id) async {
-    try {
-      _state = ResultState.loading;
+    _state = ResultState.loading;
+    _restaurantDetail = null;
+    notifyListeners();
 
+    try {
       final result = await apiService.restaurantDetail(id);
 
-      _state = ResultState.hasData;
-      _restaurantDetail = result.restaurant;
+      if (result.restaurant != null) {
+        _restaurantDetail = result.restaurant;
+        _state = ResultState.hasData;
+      } else {
+        _state = ResultState.noData;
+        _message = "Restaurant not found";
+      }
     } catch (e) {
       _state = ResultState.error;
       _message = "Failed to fetch detail: $e";
     }
+
     notifyListeners();
   }
 
   Future<void> searchRestaurants(String query) async {
-    try {
-      _state = ResultState.loading;
+    _state = ResultState.loading;
+    _searchResults = [];
+    notifyListeners();
 
+    try {
       final result = await apiService.searchRestaurants(query);
 
       if (result.restaurants.isEmpty) {
         _state = ResultState.noData;
         _message = "No results found for \"$query\"";
       } else {
-        _state = ResultState.hasData;
         _searchResults = result.restaurants;
+        _state = ResultState.hasData;
       }
     } catch (e) {
       _state = ResultState.error;
       _message = "Search failed: $e";
     }
+
     notifyListeners();
   }
 
@@ -93,6 +105,7 @@ class RestaurantProvider extends ChangeNotifier {
     } catch (e) {
       _message = "Error adding review: $e";
     }
+
     notifyListeners();
   }
 }

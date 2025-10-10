@@ -32,9 +32,12 @@ class RestaurantApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (_) => RestaurantProvider(apiService: ApiService())),
+          create: (_) => RestaurantProvider(apiService: ApiService()),
+        ),
         ChangeNotifierProvider(create: (_) => ThemeProvider()..loadTheme()),
-        ChangeNotifierProvider(create: (_) => FavoriteProvider()..loadFavorites()),
+        ChangeNotifierProvider(
+          create: (_) => FavoriteProvider()..loadFavorites(),
+        ),
         ChangeNotifierProvider(create: (_) => ReminderProvider()..load()),
         ChangeNotifierProvider(create: (_) => NavProvider()),
       ],
@@ -53,17 +56,23 @@ class RestaurantApp extends StatelessWidget {
               switch (settings.name) {
                 case '/':
                   return MaterialPageRoute(
-                      builder: (_) => const RestaurantListPage());
+                    builder: (_) => const RestaurantListPage(),
+                  );
                 case '/detail':
                   final id = settings.arguments as String;
                   return MaterialPageRoute(
-                      builder: (_) => RestaurantDetailPage(id: id));
+                    builder: (_) => RestaurantDetailPage(id: id),
+                  );
                 case '/search':
                   return MaterialPageRoute(builder: (_) => const SearchPage());
                 case '/favorites':
-                  return MaterialPageRoute(builder: (_) => const FavoritePage());
+                  return MaterialPageRoute(
+                    builder: (_) => const FavoritePage(),
+                  );
                 case '/settings':
-                  return MaterialPageRoute(builder: (_) => const SettingsPage());
+                  return MaterialPageRoute(
+                    builder: (_) => const SettingsPage(),
+                  );
                 default:
                   return null;
               }

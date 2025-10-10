@@ -12,24 +12,24 @@ class RestaurantCard extends m.StatelessWidget {
     return m.Hero(
       tag: restaurant.id,
       transitionOnUserGestures: true,
-      flightShuttleBuilder: (
-          flightContext,
-          animation,
-          flightDirection,
-          fromHeroContext,
-          toHeroContext,
+      flightShuttleBuilder:
+          (
+            flightContext,
+            animation,
+            flightDirection,
+            fromHeroContext,
+            toHeroContext,
           ) {
-        return m.Material(
-          color: m.Colors.transparent,
-          child: toHeroContext.widget,
-        );
-      },
+            return m.Material(
+              color: m.Colors.transparent,
+              child: toHeroContext.widget,
+            );
+          },
       child: SurfaceCard(
+        clipBehavior: m.Clip.hardEdge, // prevent image overflow
         padding: m.EdgeInsets.zero,
         borderRadius: m.BorderRadius.circular(12),
-        child: m.ClipRRect(
-          borderRadius: m.BorderRadius.circular(12),
-          clipBehavior: m.Clip.hardEdge, // ✅ Ini sudah benar
+        child: ClipRect(
           child: m.Column(
             mainAxisSize: m.MainAxisSize.min,
             crossAxisAlignment: m.CrossAxisAlignment.start,
@@ -53,62 +53,50 @@ class RestaurantCard extends m.StatelessWidget {
                 ),
               ),
 
-              // Text content - ✅ Dibungkus dengan Flexible untuk mencegah overflow
-              m.Flexible(
-                child: m.Padding(
-                  padding: const m.EdgeInsets.all(12),
-                  child: m.Column(
-                    crossAxisAlignment: m.CrossAxisAlignment.start,
-                    mainAxisSize: m.MainAxisSize.min,
-                    children: [
-                      // Restaurant name
-                      m.Text(
-                        restaurant.name,
-                        style: m.Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(fontWeight: m.FontWeight.bold),
-                        maxLines: 1,
-                        overflow: m.TextOverflow.ellipsis,
+              m.Padding(
+                padding: const m.EdgeInsets.all(12),
+                child: m.Column(
+                  crossAxisAlignment: m.CrossAxisAlignment.start,
+                  mainAxisSize: m.MainAxisSize.min,
+                  children: [
+                    m.Text(
+                      restaurant.name,
+                      style: m.Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(fontWeight: m.FontWeight.bold),
+                      maxLines: 1,
+                      overflow: m.TextOverflow.ellipsis,
+                    ),
+                    const m.SizedBox(height: 4),
+
+                    m.Text(
+                      restaurant.city,
+                      style: m.Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: m.Colors.grey[600],
                       ),
+                      maxLines: 1,
+                      overflow: m.TextOverflow.ellipsis,
+                    ),
+                    const m.SizedBox(height: 8),
 
-                      const m.SizedBox(height: 4),
-
-                      // City
-                      m.Text(
-                        restaurant.city,
-                        style: m.Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.copyWith(color: m.Colors.grey[600]),
-                        maxLines: 1,
-                        overflow: m.TextOverflow.ellipsis,
-                      ),
-
-                      const m.SizedBox(height: 8),
-
-                      // Rating row
-                      m.Row(
-                        mainAxisSize: m.MainAxisSize.min,
-                        children: [
-                          const m.Icon(
-                            m.Icons.star,
-                            size: 16,
-                            color: m.Colors.amber,
+                    m.Row(
+                      children: [
+                        const m.Icon(
+                          m.Icons.star,
+                          size: 16,
+                          color: m.Colors.amber,
+                        ),
+                        const m.SizedBox(width: 6),
+                        m.Expanded(
+                          child: m.Text(
+                            restaurant.rating.toString(),
+                            style: m.Theme.of(context).textTheme.bodyMedium,
+                            maxLines: 1,
+                            overflow: m.TextOverflow.ellipsis,
                           ),
-                          const m.SizedBox(width: 6),
-                          m.Flexible(
-                            child: m.Text(
-                              restaurant.rating.toString(),
-                              style: m.Theme.of(context).textTheme.bodyMedium,
-                              maxLines: 1,
-                              overflow: m.TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
