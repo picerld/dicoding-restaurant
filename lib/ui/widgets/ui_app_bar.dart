@@ -41,17 +41,6 @@ class UiAppBar extends StatelessWidget {
               density: ButtonDensity.icon,
               child: const Icon(Icons.search),
             ),
-
-            IconButton.outline(
-              icon: Icon(
-                context.watch<ThemeProvider>().themeMode == ThemeMode.dark
-                    ? Icons.dark_mode
-                    : Icons.light_mode,
-              ),
-              onPressed: () {
-                context.read<ThemeProvider>().toggleTheme();
-              },
-            ),
           ],
         ),
         const Divider(),
