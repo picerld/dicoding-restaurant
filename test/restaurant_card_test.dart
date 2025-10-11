@@ -7,7 +7,6 @@ import 'package:restaurant_app/ui/widgets/restaurant_card.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 void main() {
-  // Mock restaurant data untuk testing
   final mockRestaurant = Restaurant(
     id: 'test-001',
     name: 'Resto Test',
@@ -95,7 +94,6 @@ void main() {
     await tester.pumpWidget(createTestWidget(mockRestaurant));
     await tester.pumpAndSettle();
 
-    // Verify Provider is used
     final BuildContext context = tester.element(find.byType(RestaurantCard));
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     expect(themeProvider, isNotNull);
@@ -116,7 +114,6 @@ void main() {
     await tester.pumpWidget(createTestWidget(longNameRestaurant));
     await tester.pumpAndSettle();
 
-    // Verify no overflow errors
     expect(tester.takeException(), isNull);
   });
 
@@ -175,13 +172,10 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    // Verify no overflow
     expect(tester.takeException(), isNull);
 
-    // Find at least one card (some may be off-screen)
     expect(find.byType(RestaurantCard), findsWidgets);
 
-    // Verify first card is visible
     expect(find.text('Resto 0'), findsOneWidget);
   });
 }

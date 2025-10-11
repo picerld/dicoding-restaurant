@@ -147,11 +147,10 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           Text('Reviews').h3,
                           const SizedBox(height: 8),
 
-                          // Option 2: Use Scrollbar with thumbVisibility false
                           ConstrainedBox(
                             constraints: const BoxConstraints(maxHeight: 300),
                             child: Scrollbar(
-                              thumbVisibility: false, // Changed to false
+                              thumbVisibility: false,
                               controller: _reviewController,
                               child: ListView.builder(
                                 controller: _reviewController,
