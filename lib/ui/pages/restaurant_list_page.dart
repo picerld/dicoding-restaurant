@@ -1,25 +1,26 @@
+import 'package:flutter/material.dart' as m;
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/provider/nav_provider.dart';
 import 'package:restaurant_app/ui/widgets/bottom_nav.dart';
-import 'package:restaurant_app/ui/widgets/error_state.dart';
-import 'package:restaurant_app/ui/widgets/ui_app_bar.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import '../../provider/restaurant_provider.dart';
+import '../../provider/nav_provider.dart';
 import '../widgets/restaurant_card.dart';
+import '../widgets/error_state.dart';
+import '../widgets/ui_app_bar.dart';
 import 'restaurant_detail_page.dart';
 
-class RestaurantListPage extends StatefulWidget {
+class RestaurantListPage extends m.StatefulWidget {
   const RestaurantListPage({super.key});
 
   @override
-  State<RestaurantListPage> createState() => _RestaurantListPageState();
+  m.State<RestaurantListPage> createState() => _RestaurantListPageState();
 }
 
-class _RestaurantListPageState extends State<RestaurantListPage> {
+class _RestaurantListPageState extends m.State<RestaurantListPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.microtask(() {
       Provider.of<RestaurantProvider>(
         context,
         listen: false,
@@ -28,44 +29,13 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  m.Widget build(m.BuildContext context) {
     final navProvider = Provider.of<NavProvider>(context);
+    final provider = Provider.of<RestaurantProvider>(context);
 
     return Scaffold(
-      headers: const [UiAppBar(title: "Restaurant")],
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 80),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    "Welcome!",
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "Cari restoran favorit kamu!!",
-                    style: TextStyle(fontSize: 16, color: Colors.gray),
-                  ),
-                ],
-              ),
-            ),
-            Consumer<RestaurantProvider>(
-              builder: (context, provider, _) {
-                return AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 400),
-                  child: _buildContent(provider),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      headers: const [UiAppBar(title: 'Restaurant')],
+      child: CustomScrollView(slivers: _buildContent(provider)),
       footers: [
         ShadcnBottomNav(
           currentIndex: navProvider.index,
@@ -75,43 +45,71 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     );
   }
 
-  Widget _buildContent(RestaurantProvider provider) {
+  List<m.Widget> _buildContent(RestaurantProvider provider) {
     switch (provider.state) {
       case ResultState.loading:
-        return const Center(child: CircularProgressIndicator());
+        return const [
+          SliverToBoxAdapter(
+            child: m.Center(
+              child: m.Padding(
+                padding: m.EdgeInsets.only(top: 20),
+                child: m.CircularProgressIndicator(),
+              ),
+            ),
+          ),
+        ];
+
       case ResultState.hasData:
-        return ListView.separated(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          padding: const EdgeInsets.all(16),
-          itemCount: provider.restaurants.length,
-          itemBuilder: (context, index) {
-            final restaurant = provider.restaurants[index];
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => RestaurantDetailPage(id: restaurant.id),
+        return [
+          m.SliverPadding(
+            padding: const m.EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            sliver: m.SliverList.builder(
+              itemCount: provider.restaurants.length,
+              itemBuilder: (context, index) {
+                final restaurant = provider.restaurants[index];
+                return m.Padding(
+                  padding: const m.EdgeInsets.only(bottom: 20),
+                  child: m.GestureDetector(
+                    onTap: () {
+                      m.Navigator.push(
+                        context,
+                        m.MaterialPageRoute(
+                          builder: (_) =>
+                              RestaurantDetailPage(id: restaurant.id),
+                        ),
+                      );
+                    },
+                    child: RestaurantCard(restaurant: restaurant),
                   ),
                 );
               },
-              child: RestaurantCard(restaurant: restaurant),
-            );
-          },
-          separatorBuilder: (context, index) => const SizedBox(height: 20),
-        );
+            ),
+          ),
+        ];
+
       case ResultState.noData:
-        return Center(
-          child: Text(provider.message, style: const TextStyle(fontSize: 16)),
-        );
+        return [
+          SliverToBoxAdapter(
+            child: m.Center(
+              child: m.Padding(
+                padding: const m.EdgeInsets.only(top: 20),
+                child: m.Text(provider.message),
+              ),
+            ),
+          ),
+        ];
+
       case ResultState.error:
-        return ErrorState(
-          message: provider.message,
-          onRetry: () {
-            provider.fetchRestaurants();
-          },
-        );
+        return [
+          SliverToBoxAdapter(
+            child: ErrorState(
+              message: provider.message,
+              onRetry: () {
+                provider.fetchRestaurants();
+              },
+            ),
+          ),
+        ];
     }
   }
 }

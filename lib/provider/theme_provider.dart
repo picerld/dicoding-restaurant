@@ -40,4 +40,11 @@ class ThemeProvider extends ChangeNotifier {
       await setTheme(ThemeMode.light);
     }
   }
+
+  bool isDark(BuildContext context) {
+    if (_themeMode == ThemeMode.dark) return true;
+    if (_themeMode == ThemeMode.light) return false;
+
+    return Theme.of(context).brightness == Brightness.dark;
+  }
 }
